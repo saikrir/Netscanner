@@ -1,4 +1,4 @@
-package org.saikrishna.apps.scanner.task;
+package org.saikrishna.apps.scanner.task.utils;
 
 import java.net.InetAddress;
 import java.util.Iterator;

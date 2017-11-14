@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static org.saikrishna.apps.scanner.task.TaskUtils.ipAddressesInRange;
-import static org.saikrishna.apps.scanner.task.TaskUtils.isSuccessfulLookup;
+import static org.saikrishna.apps.scanner.task.utils.TaskUtils.ipAddressesInRange;
+import static org.saikrishna.apps.scanner.task.utils.TaskUtils.isSuccessfulLookup;
 
 public class IPAddressRangeScanTask implements Callable<List<LookupResult>> {
 

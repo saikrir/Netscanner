@@ -9,8 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.saikrishna.apps.scanner.task.TaskUtils.ipAddressesInRange;
-import static org.saikrishna.apps.scanner.task.TaskUtils.isSuccessfulLookup;
+import static org.saikrishna.apps.scanner.task.utils.TaskUtils.ipAddressesInRange;
+import static org.saikrishna.apps.scanner.task.utils.TaskUtils.isSuccessfulLookup;
 
 public class IPAddressScanResultsSupplier implements Supplier<List<LookupResult>>{
 
