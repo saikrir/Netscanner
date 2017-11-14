@@ -11,9 +11,8 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        INetScanner<List<LookupResult>> scanner = (INetScanner<List<LookupResult>>) ExecutionTimeReporter.wrapAround(new NetscannerV2());
+        INetScanner<List<LookupResult>> scanner = (INetScanner<List<LookupResult>>)
+                ExecutionTimeReporter.wrapAround(new NetscannerV2());
         new HostPrinter().printHosts(scanner.scanNetwork("192.168.1."));
     }
-
-
 }

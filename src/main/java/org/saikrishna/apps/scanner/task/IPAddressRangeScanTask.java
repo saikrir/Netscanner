@@ -10,6 +10,9 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.saikrishna.apps.scanner.task.TaskUtils.ipAddressesInRange;
+import static org.saikrishna.apps.scanner.task.TaskUtils.isSuccessfulLookup;
+
 public class IPAddressRangeScanTask implements Callable<List<LookupResult>> {
 
     private String ipPrefix;
@@ -25,7 +28,7 @@ public class IPAddressRangeScanTask implements Callable<List<LookupResult>> {
     @Override
     public List<LookupResult> call() throws Exception {
 
-        Iterator<String> ipAddressesInRange = ipAddressesInRange();
+        Iterator<String> ipAddressesInRange = ipAddressesInRange(ipPrefix, startIndex, endIndex);
         List<LookupResult> lookupResults = new ArrayList<>();
 
         for (Iterator<String> ipAddressIterator = ipAddressesInRange; ipAddressIterator.hasNext(); ) {
@@ -37,28 +40,6 @@ public class IPAddressRangeScanTask implements Callable<List<LookupResult>> {
                 lookupResults.add(new LookupResult(inetAddress.getCanonicalHostName(), ipAddress));
             }
         }
-
         return lookupResults;
     }
-
-
-    protected boolean isSuccessfulLookup(InetAddress inetAddress, String lookupIpAddress) {
-
-        boolean isSuccessfulLookup = false;
-
-        if(inetAddress!= null) {
-            isSuccessfulLookup = !lookupIpAddress.equals(inetAddress.getCanonicalHostName());
-        }
-
-        return isSuccessfulLookup;
-    }
-
-    protected Iterator<String> ipAddressesInRange() {
-
-        List<String> ipAddresses = IntStream.range(this.startIndex, this.endIndex)
-                .mapToObj( number-> this.ipPrefix + number)
-                .collect(Collectors.toList());
-        return ipAddresses.iterator();
-    }
-
 }

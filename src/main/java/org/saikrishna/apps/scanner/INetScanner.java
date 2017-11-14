@@ -2,7 +2,7 @@ package org.saikrishna.apps.scanner;
 
 public interface INetScanner<R>{
 
-    int NUM_WORKER_THREADS = 10;
+    int NUM_WORKER_THREADS = 20;
     int DEFAULT_HOST_SET = 255;
 
     R scanNetwork(String ipAddresPrefix);
