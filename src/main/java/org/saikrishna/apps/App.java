@@ -13,6 +13,6 @@ public class App {
     public static void main(String[] args) {
         INetScanner<List<LookupResult>> scanner = (INetScanner<List<LookupResult>>)
                 ExecutionTimeReporter.wrapAround(new NetscannerV2());
-        new HostPrinter().printHosts(scanner.scanNetwork("192.168.1."));
+        new HostPrinter().printHosts(scanner.scanNetwork("10.68.113.", 100));
     }
 }

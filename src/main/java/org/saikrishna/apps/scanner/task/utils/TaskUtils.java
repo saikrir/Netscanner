@@ -20,7 +20,7 @@ public class TaskUtils {
     }
 
     public static Iterator<String> ipAddressesInRange(String ipPrefix, int startIndex, int endIndex) {
-        List<String> ipAddresses = IntStream.range(startIndex, endIndex)
+        List<String> ipAddresses = IntStream.rangeClosed(startIndex, endIndex)
                 .mapToObj( number-> ipPrefix + number)
                 .collect(Collectors.toList());
         return ipAddresses.iterator();

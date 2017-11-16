@@ -3,6 +3,7 @@ package org.saikrishna.apps.scanner.task;
 import org.saikrishna.apps.model.LookupResult;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,12 +33,16 @@ public class IPAddressRangeScanTask implements Callable<List<LookupResult>> {
         for (Iterator<String> ipAddressIterator = ipAddressesInRange; ipAddressIterator.hasNext(); ) {
 
             String ipAddress = ipAddressIterator.next();
-            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+            InetAddress inetAddress = getInetAddress(ipAddress);
 
             if(isSuccessfulLookup(inetAddress, ipAddress)){
                 lookupResults.add(new LookupResult(inetAddress.getCanonicalHostName(), ipAddress));
             }
         }
         return lookupResults;
+    }
+
+    protected InetAddress getInetAddress(String ipAddress) throws UnknownHostException {
+        return InetAddress.getByName(ipAddress);
     }
 }

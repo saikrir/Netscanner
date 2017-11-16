@@ -34,20 +34,25 @@ public class IPAddressScanResultsSupplier implements Supplier<List<LookupResult>
         List<LookupResult> lookupResults = new ArrayList<>();
 
         while (ipAddressesInRange.hasNext()) {
-            String nextIpAddress =  ipAddressesInRange.next();
-            InetAddress inetAddress = null;
 
-            try {
-                inetAddress =InetAddress.getByName(nextIpAddress);
-            }
-            catch (UnknownHostException e) {
-                System.err.println(e);
-            }
+            String nextIpAddress =  ipAddressesInRange.next();
+            InetAddress inetAddress = getInetAddress(nextIpAddress);
 
             if(isSuccessfulLookup(inetAddress, nextIpAddress)) {
                 lookupResults.add(new LookupResult(inetAddress.getCanonicalHostName(), nextIpAddress));
             }
         }
         return lookupResults;
+    }
+
+    protected InetAddress getInetAddress(String nextIpAddress) {
+        InetAddress inetAddress = null;
+        try {
+            inetAddress =InetAddress.getByName(nextIpAddress);
+        }
+        catch (UnknownHostException e) {
+            System.err.println(e);
+        }
+        return inetAddress;
     }
 }
