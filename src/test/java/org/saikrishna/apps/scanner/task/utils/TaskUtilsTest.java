@@ -53,4 +53,10 @@ public class TaskUtilsTest {
         inetAddress = InetAddress.getByName("10.10.10.10");
         assertFalse(TaskUtils.isSuccessfulLookup(inetAddress, "10.10.10.10"));
     }
+
+
+    @Test
+    public void testIPAddressPrefix() {
+        System.out.println(TaskUtils.localIpAddressPrefix());
+    }
 }

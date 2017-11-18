@@ -1,13 +1,16 @@
 package org.saikrishna.apps.scanner;
 
-import org.saikrishna.apps.model.BatchSizeCalculator;
+import org.saikrishna.apps.model.ChunkBounds;
 import org.saikrishna.apps.model.LookupResult;
 import org.saikrishna.apps.scanner.task.IPAddressScanResultsSupplier;
+import org.saikrishna.apps.scanner.task.utils.Chunks;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class NetscannerV2 implements INetScanner<List<LookupResult>> {
 
@@ -17,31 +20,32 @@ public class NetscannerV2 implements INetScanner<List<LookupResult>> {
     }
 
     @Override
-    public List<LookupResult> scanNetwork(final String ipAddressPrefix, int scanNum) {
+    public List<LookupResult> scanNetwork(final String ipAddressPrefix, int numIpsToScan) {
 
         List<LookupResult> scanResults = null;
-        BatchSizeCalculator batchSzCalc = null;
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_WORKER_THREADS);
-        List<CompletableFuture<List<LookupResult>>> complatableFutures = new ArrayList<>();
+        List<CompletableFuture<List<LookupResult>>> completableFutures = new ArrayList<>();
+        Chunks chunks = new Chunks(NUM_WORKER_THREADS, numIpsToScan);
 
-        for ( batchSzCalc = new BatchSizeCalculator(NUM_WORKER_THREADS, scanNum)
-              ;batchSzCalc.canIterate()
-                ;batchSzCalc.next()) {
+        for (ChunkBounds chunkBounds : chunks) {
 
-            final int startIndex = batchSzCalc.getStartIndex();
-            final int endIndex = batchSzCalc.getEndIndex();
+            CompletableFuture<List<LookupResult>> listCompletableFuture = supplyAsync(
+                    new IPAddressScanResultsSupplier(ipAddressPrefix,
+                            chunkBounds.getStartIdx(), chunkBounds.getEndIdx()),
+                    executorService);
 
-            complatableFutures.add(
-                CompletableFuture.supplyAsync(
-                 new IPAddressScanResultsSupplier(ipAddressPrefix, startIndex, endIndex), executorService)
-            );
+            completableFutures.add(listCompletableFuture);
         }
 
-        scanResults = complatableFutures.stream().map(completableFuture -> {
+        System.out.println("Scanning...");
+
+        scanResults = completableFutures.stream().map(completableFuture -> {
             List<LookupResult> results = null;
-            try { results = completableFuture.get(); } catch (InterruptedException | ExecutionException e) { }
+            try { results = completableFuture.get(); } catch (InterruptedException | ExecutionException ignored) { }
             return results;
-        }).flatMap(lookupResults -> lookupResults.stream()).collect(Collectors.toList());
+        }).flatMap(lookupResults -> lookupResults.stream())
+                .collect(Collectors.toList());
+
         executorService.shutdown();
         return scanResults;
     }

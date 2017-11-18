@@ -1,8 +1,9 @@
 package org.saikrishna.apps.scanner;
 
-import org.saikrishna.apps.model.BatchSizeCalculator;
+import org.saikrishna.apps.model.ChunkBounds;
 import org.saikrishna.apps.scanner.task.IPAddressRangeScanTask;
 import org.saikrishna.apps.model.LookupResult;
+import org.saikrishna.apps.scanner.task.utils.Chunks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +36,16 @@ public class NetscannerV1 implements INetScanner<List<LookupResult>>{
     }
 
     public List<LookupResult> scanNetwork(String ipAddressPrefix, int scanNum){
-        BatchSizeCalculator batchSizeCalculator = null;
+
         List<Future<List<LookupResult>>> futures = new ArrayList<>();
 
-        for(batchSizeCalculator = new BatchSizeCalculator(NUM_WORKER_THREADS, scanNum);
-            batchSizeCalculator.canIterate();
-            batchSizeCalculator.next()) {
+        Chunks chunks = new Chunks(NUM_WORKER_THREADS, scanNum);
 
-            futures.add(this.executorService.submit(new IPAddressRangeScanTask(ipAddressPrefix,
-                    batchSizeCalculator.getStartIndex() , batchSizeCalculator.getEndIndex())));
-            batchSizeCalculator.next();
+        for(ChunkBounds chunkBound : chunks) {
+            futures.add(
+                    executorService.submit(new IPAddressRangeScanTask(ipAddressPrefix,
+                    chunkBound.getStartIdx() , chunkBound.getEndIdx())
+            ));
         }
 
         System.out.println("Scanning ...");
@@ -59,7 +60,7 @@ public class NetscannerV1 implements INetScanner<List<LookupResult>>{
                 .filter(lookupResult -> lookupResult!=null)
                 .collect(Collectors.toList());
 
-        this.executorService.shutdown();
+        executorService.shutdown();
         return results;
     }
 }
